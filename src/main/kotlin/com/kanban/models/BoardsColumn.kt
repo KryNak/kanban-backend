@@ -1,20 +1,22 @@
 package com.kanban.models
 
 import java.util.*
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.*
 
 @Entity(name = "columns")
-class BoardsColumn(
-    val name: String,
-    @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
-    val tasks: MutableSet<Task>
-) {
+class BoardsColumn {
 
     @Id
-    var id: UUID = UUID.randomUUID()
+    var id: UUID? = null
 
-    constructor(): this("", mutableSetOf())
+    var name: String = ""
+
+    @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
+    @JoinColumn(name = "column_id")
+    var tasks: MutableSet<Task> = mutableSetOf()
+
+    @PrePersist
+    fun setup() {
+        id = UUID.randomUUID()
+    }
 }

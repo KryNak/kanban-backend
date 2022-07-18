@@ -4,18 +4,24 @@ import java.util.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
+import javax.persistence.PrePersist
 
 @Entity(name = "Boards")
-class Board(
-    val name: String,
-    @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
-    val columns: MutableSet<BoardsColumn>
-) {
+class Board {
 
     @Id
-    var id: UUID = UUID.randomUUID()
+    var id: UUID? = null
 
-    constructor(): this("", mutableSetOf())
+    var name: String = ""
 
+    @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
+    @JoinColumn(name = "board_id")
+    var columns: MutableSet<BoardsColumn> = mutableSetOf()
+
+    @PrePersist
+    fun setup() {
+        id = UUID.randomUUID()
+    }
 }

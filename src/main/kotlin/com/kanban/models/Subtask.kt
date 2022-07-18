@@ -4,16 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.PrePersist
 
 @Entity(name = "subtasks")
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Subtask(
-    val title: String,
-    val isCompleted: Boolean
-) {
+class Subtask {
 
     @Id
-    var id: UUID = UUID.randomUUID()
+    var id: UUID? = null
 
-    constructor(): this("", false)
+    var title: String = ""
+    var isCompleted: Boolean = false
+
+    @PrePersist
+    fun setup() {
+        id = UUID.randomUUID()
+    }
 }
