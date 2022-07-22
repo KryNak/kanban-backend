@@ -1,10 +1,12 @@
-package com.kanban.dtos.requests
+package com.kanban.dtos.responses
 
-import java.util.UUID
+import java.util.*
 
-class UpdateBoardRequestDto {
+class CreateBoardResponseDto {
 
+    var id: UUID? = null
     var name: String = ""
+
     var columns: MutableSet<ColumnDto> = mutableSetOf()
 
     class ColumnDto {

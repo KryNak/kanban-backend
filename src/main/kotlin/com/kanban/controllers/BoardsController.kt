@@ -2,8 +2,10 @@ package com.kanban.controllers
 
 import com.kanban.dtos.requests.CreateBoardRequestDto
 import com.kanban.dtos.requests.UpdateBoardRequestDto
+import com.kanban.dtos.responses.CreateBoardResponseDto
 import com.kanban.dtos.responses.GetBoardResponseDto
 import com.kanban.dtos.responses.GetBoardsResponseDto
+import com.kanban.dtos.responses.UpdateBoardResponseDto
 import com.kanban.models.Board
 import com.kanban.repositories.BoardRepository
 import org.modelmapper.ModelMapper
@@ -12,7 +14,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.net.URI
-import java.util.UUID
+import java.util.*
 
 
 @RestController
@@ -34,7 +36,8 @@ class BoardsController(
     @DeleteMapping(path = ["/boards/{id}"])
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun deleteBoard(@PathVariable id: UUID) {
-        boardRepository.deleteById(id)
+        boardRepository.findById(id)
+            .ifPresent { boardRepository.deleteById(id) }
     }
 
     @GetMapping(path = ["/boards/{id}"])
@@ -45,9 +48,17 @@ class BoardsController(
     }
 
     @PostMapping(path = ["/boards"])
-    fun createBoard(@RequestBody createBoardRequest: CreateBoardRequestDto): ResponseEntity<Void> {
+    fun createBoard(@RequestBody createBoardRequest: CreateBoardRequestDto): ResponseEntity<CreateBoardResponseDto> {
         val savedBoard = boardRepository.save(modelMapper.map(createBoardRequest, Board::class.java))
-        return ResponseEntity.created(URI.create("/api/boards/${savedBoard.id}")).build()
+        return ResponseEntity.created(URI.create("/api/boards/${savedBoard.id}")).body(modelMapper.map(savedBoard, CreateBoardResponseDto::class.java))
+    }
+
+    @PutMapping(path = ["/boards/{id}"])
+    fun updateBoard(@RequestBody updateBoardRequestDto: UpdateBoardRequestDto, @PathVariable id: UUID): ResponseEntity<UpdateBoardResponseDto> {
+        val board = modelMapper.map(updateBoardRequestDto, Board::class.java)
+        board.id = id
+
+        return ResponseEntity.ok(modelMapper.map(board, UpdateBoardResponseDto::class.java))
     }
 
 }
