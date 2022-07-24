@@ -54,11 +54,11 @@ class BoardsController(
     }
 
     @PutMapping(path = ["/boards/{id}"])
-    fun updateBoard(@RequestBody updateBoardRequestDto: UpdateBoardRequestDto, @PathVariable id: UUID): ResponseEntity<UpdateBoardResponseDto> {
+    fun updateBoard(@RequestBody updateBoardRequestDto: UpdateBoardRequestDto, @PathVariable id: UUID): ResponseEntity<Board> {
         val board = modelMapper.map(updateBoardRequestDto, Board::class.java)
-        board.id = id
+        boardRepository.save(board)
 
-        return ResponseEntity.ok(modelMapper.map(board, UpdateBoardResponseDto::class.java))
+        return ResponseEntity.ok(board)
     }
 
 }
