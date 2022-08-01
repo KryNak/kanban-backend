@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
+    id("org.flywaydb.flyway") version "9.0.4"
     groovy
 }
 
@@ -26,8 +27,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.modelmapper:modelmapper:3.1.0")
+    implementation("io.github.microutils:kotlin-logging:2.1.23")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.h2database:h2")
+    testImplementation("org.assertj:assertj-core:3.23.1")
 }
 
 tasks.withType<KotlinCompile> {
@@ -39,4 +45,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/admin"
+    user = "admin"
+    password = "admin"
 }

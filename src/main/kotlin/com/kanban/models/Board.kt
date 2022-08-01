@@ -18,10 +18,10 @@ class Board {
 
     @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @JoinColumn(name = "board_id")
-    var columns: MutableSet<BoardsColumn> = mutableSetOf()
+    var columns: MutableList<BoardsColumn> = mutableListOf()
 
     @PrePersist
     fun setup() {
-        id = UUID.randomUUID()
+        id = id ?: UUID.randomUUID()
     }
 }

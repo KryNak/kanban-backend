@@ -4,6 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 
+@Table(uniqueConstraints = [UniqueConstraint(name = "task_position", columnNames = ["position", "column_id"])])
 @Entity(name = "Tasks")
 class Task {
 
@@ -16,12 +17,14 @@ class Task {
 
     var status: String = ""
 
+    var position: Int = 0
+
     @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @JoinColumn(name = "task_id")
-    var subtasks: MutableSet<Subtask> = mutableSetOf()
+    var subtasks: MutableList<Subtask> = mutableListOf()
 
     @PrePersist
     fun setup() {
-        id = UUID.randomUUID()
+        id = id ?: UUID.randomUUID()
     }
 }

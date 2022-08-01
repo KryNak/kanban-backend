@@ -5,7 +5,8 @@ import java.util.*
 class GetColumnsByIdResponseDto {
     var id: UUID? = null
     var name: String = ""
-    var tasks: MutableSet<TaskDto> = mutableSetOf()
+    var tasks: MutableList<TaskDto> = mutableListOf()
+    var position: Int = 0
 }
 
 class TaskDto {
@@ -13,11 +14,13 @@ class TaskDto {
     var title: String = ""
     var description: String = ""
     var status: String = ""
-    var subtasks: MutableSet<SubtaskDto> = mutableSetOf()
+    var subtasks: MutableList<SubtaskDto> = mutableListOf()
+    var position: Int = 0
 }
 
 class SubtaskDto {
     var id: UUID? = null
     var title: String = ""
     var isCompleted: Boolean = false
+    var position: Int = 0
 }
