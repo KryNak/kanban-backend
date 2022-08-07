@@ -4,7 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 
-@Table(uniqueConstraints = [UniqueConstraint(name = "task_position", columnNames = ["position", "column_id"])])
+//@Table(uniqueConstraints = [UniqueConstraint(name = "task_position", columnNames = ["position", "column_id"])])
 @Entity(name = "Tasks")
 class Task {
 

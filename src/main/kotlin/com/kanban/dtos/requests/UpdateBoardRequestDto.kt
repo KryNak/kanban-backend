@@ -6,9 +6,9 @@ class UpdateBoardRequestDto {
 
     var id: UUID? = null
     var name: String = ""
-    var columns: MutableList<ColumnDto> = mutableListOf()
+    var columns: MutableList<UpdateBoardsColumnRequestDto> = mutableListOf()
 
-    class ColumnDto {
+    class UpdateBoardsColumnRequestDto {
 
         var id: UUID? = null
         var name: String = ""

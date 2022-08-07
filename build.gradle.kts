@@ -1,4 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.ir.backend.js.compile
+import org.jooq.meta.jaxb.*
+import org.jooq.meta.jaxb.Target
+import org.jooq.codegen.GenerationTool
 
 plugins {
     id("org.springframework.boot") version "2.7.1"
@@ -12,7 +16,7 @@ plugins {
 
 group = "com"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -29,6 +33,7 @@ dependencies {
     implementation("org.modelmapper:modelmapper:3.1.0")
     implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jooq:2.7.2")
     implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -39,7 +44,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -51,4 +56,32 @@ flyway {
     url = "jdbc:postgresql://localhost:5432/admin"
     user = "admin"
     password = "admin"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath("org.jooq:jooq:3.14.4")
+        classpath("org.jooq:jooq-codegen:3.14.4")
+        classpath("org.postgresql:postgresql:42.4.1")
+    }
+}
+
+tasks.create("jooqGenerate") {
+    GenerationTool.generate(Configuration()
+        .withJdbc(Jdbc()
+            .withUser("admin")
+            .withPassword("admin")
+            .withDriver("org.postgresql.Driver")
+            .withUrl("jdbc:postgresql://localhost:5432/admin"))
+        .withGenerator(Generator()
+            .withDatabase(Database().withInputSchema("public"))
+            .withGenerate(Generate())
+            .withTarget(Target()
+                .withPackageName("com.kanban.jooq")
+                .withDirectory("${projectDir}/src/main/java"))))
 }

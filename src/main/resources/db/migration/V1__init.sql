@@ -78,15 +78,15 @@ ALTER TABLE ONLY subtasks
 
 
 
-ALTER TABLE ONLY columns
-    ADD CONSTRAINT column_position UNIQUE (position, board_id);
-
-
-
-ALTER TABLE ONLY subtasks
-    ADD CONSTRAINT subtask_position UNIQUE (position, task_id);
-
-
-
-ALTER TABLE ONLY tasks
-    ADD CONSTRAINT task_position UNIQUE (position, column_id);
+-- ALTER TABLE ONLY columns
+--     ADD CONSTRAINT column_position UNIQUE (position, board_id);
+--
+--
+--
+-- ALTER TABLE ONLY subtasks
+--     ADD CONSTRAINT subtask_position UNIQUE (position, task_id);
+--
+--
+--
+-- ALTER TABLE ONLY tasks
+--     ADD CONSTRAINT task_position UNIQUE (position, column_id);

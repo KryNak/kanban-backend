@@ -4,7 +4,6 @@ import java.util.*
 
 class UpdateSubtaskRequestDto(
     val id: UUID,
-    var isCompleted: Boolean
-) {
-
-}
+    val isCompleted: Boolean,
+    val taskId: UUID
+)

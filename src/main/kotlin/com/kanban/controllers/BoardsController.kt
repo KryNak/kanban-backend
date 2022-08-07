@@ -7,6 +7,7 @@ import com.kanban.dtos.responses.GetBoardResponseDto
 import com.kanban.dtos.responses.GetBoardsResponseDto
 import com.kanban.models.Board
 import com.kanban.models.BoardsColumn
+import com.kanban.models.Task
 import com.kanban.repositories.BoardRepository
 import com.kanban.repositories.BoardsColumnRepository
 import org.modelmapper.ModelMapper

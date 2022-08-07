@@ -3,7 +3,7 @@ package com.kanban.models
 import java.util.*
 import javax.persistence.*
 
-@Table(uniqueConstraints = [UniqueConstraint(name = "column_position", columnNames = ["board_id", "position"])])
+//@Table(uniqueConstraints = [UniqueConstraint(name = "column_position", columnNames = ["board_id", "position"])])
 @Entity(name = "columns")
 class BoardsColumn {
 

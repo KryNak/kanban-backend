@@ -2,7 +2,12 @@ package com.kanban.controllers
 
 import com.kanban.dtos.responses.GetColumnResponseDto
 import com.kanban.dtos.responses.GetColumnsByIdResponseDto
+import com.kanban.dtos.responses.GetColumnsByIdSubtaskResponseDto
+import com.kanban.dtos.responses.GetColumnsByIdTaskResponseDto
+import com.kanban.jooq.Tables.*
 import com.kanban.repositories.BoardsColumnRepository
+import org.jooq.DSLContext
+import org.jooq.impl.DSL.asterisk
 import org.modelmapper.ModelMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +22,8 @@ import java.util.UUID
 @RequestMapping(path = ["/api"])
 class BoardsColumnController(
     val modelMapper: ModelMapper,
-    val columnRepository: BoardsColumnRepository
+    val columnRepository: BoardsColumnRepository,
+    val jooq: DSLContext
 ) {
 
     @GetMapping(path = ["/columns"])
@@ -29,10 +35,31 @@ class BoardsColumnController(
 
     @GetMapping(path = ["/columns/{id}"])
     fun getColumn(@PathVariable id: UUID): ResponseEntity<GetColumnsByIdResponseDto> {
-        return columnRepository.findById(id)
-            .map { modelMapper.map(it, GetColumnsByIdResponseDto::class.java) }
-            .map { ResponseEntity.ok(it) }
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
-    }
 
+        val tasks = jooq.select(asterisk())
+            .from(TASKS)
+            .where(TASKS.COLUMN_ID.eq(id))
+            .orderBy(TASKS.POSITION)
+            .fetchInto(GetColumnsByIdTaskResponseDto::class.java)
+            .map {
+                it.apply {
+                    subtasks = jooq.select(asterisk())
+                        .from(SUBTASKS)
+                        .where(SUBTASKS.TASK_ID.eq(it.id))
+                        .orderBy(SUBTASKS.POSITION)
+                        .fetchInto(GetColumnsByIdSubtaskResponseDto::class.java)
+                }
+            }
+
+        val column = jooq.select(asterisk())
+            .from(COLUMNS)
+            .where(COLUMNS.ID.eq(id))
+            .limit(1)
+            .fetchOneInto(GetColumnsByIdResponseDto::class.java)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+        column.tasks = tasks.toMutableList()
+
+        return ResponseEntity.ok(column)
+    }
 }
