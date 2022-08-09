@@ -56,6 +56,7 @@ flyway {
     url = "jdbc:postgresql://localhost:5432/admin"
     user = "admin"
     password = "admin"
+    cleanDisabled = false
 }
 
 buildscript {

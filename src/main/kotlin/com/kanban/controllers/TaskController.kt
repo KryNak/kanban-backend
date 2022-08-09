@@ -115,18 +115,24 @@ class TaskController(
             .where(TASKS.ID.eq(taskId))
             .fetchOneInto(TASKS)!!
 
+        val columnName = jooq.select(COLUMNS.NAME)
+            .from(COLUMNS)
+            .where(COLUMNS.ID.eq(columnId))
+            .fetchOneInto(String::class.java)
+
         if(task.columnId != columnId){
 
             jooq.update(TASKS)
+                .set(TASKS.POSITION, select(count()).from(TASKS).where(TASKS.COLUMN_ID.eq(columnId)))
                 .set(TASKS.COLUMN_ID, columnId)
-                .set(TASKS.POSITION, select(count().plus(1)).from(TASKS).where(TASKS.COLUMN_ID.eq(columnId)))
+                .set(TASKS.STATUS, columnName)
                 .where(TASKS.ID.eq(taskId))
                 .execute()
 
             jooq.update(TASKS)
                 .set(TASKS.POSITION, TASKS.POSITION.minus(1))
                 .where(TASKS.POSITION.greaterThan(task.position))
-                .and(TASKS.COLUMN_ID.eq(columnId))
+                .and(TASKS.COLUMN_ID.eq(task.columnId))
                 .execute()
 
         }
