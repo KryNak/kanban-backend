@@ -3,13 +3,12 @@ package com.kanban.controllers
 import com.kanban.dtos.requests.CreateBoardRequestDto
 import com.kanban.dtos.requests.UpdateBoardRequestDto
 import com.kanban.dtos.responses.CreateBoardResponseDto
-import com.kanban.dtos.responses.GetBoardResponseDto
 import com.kanban.dtos.responses.GetBoardsResponseDto
 import com.kanban.models.Board
 import com.kanban.models.BoardsColumn
-import com.kanban.models.Task
 import com.kanban.repositories.BoardRepository
 import com.kanban.repositories.BoardsColumnRepository
+import org.jooq.DSLContext
 import org.modelmapper.ModelMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,6 +24,7 @@ import javax.transaction.Transactional
 class BoardsController(
     val boardRepository: BoardRepository,
     val columnRepository: BoardsColumnRepository,
+    val jooq: DSLContext,
     val modelMapper: ModelMapper
 ) {
 
@@ -45,21 +45,45 @@ class BoardsController(
     }
 
     @GetMapping(path = ["/boards/{id}"])
-    fun getBoard(@PathVariable id: UUID): ResponseEntity<GetBoardResponseDto> {
-        return boardRepository.findById(id)
-            .map { ResponseEntity.ok(modelMapper.map(it, GetBoardResponseDto::class.java)) }
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+    fun getBoard(@PathVariable id: UUID): ResponseEntity<Board> {
+
+        val board = boardRepository.findById(id)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }!!
+
+        board.apply {
+            this.columns = this.columns.map { column ->
+                column.apply {
+                    this.tasks = this.tasks.map { task ->
+                        task.apply {
+                            this.subtasks = this.subtasks
+                                .sortedBy { subtask -> subtask.position }
+                                .toMutableList()
+                        }
+                    }
+                        .sortedBy { task -> task.position }
+                        .toMutableList()
+                }
+            }
+                .sortedBy { column -> column.position }
+                .toMutableList()
+        }
+
+        return ResponseEntity.ok(board)
     }
 
     @PostMapping(path = ["/boards"])
     fun createBoard(@RequestBody createBoardRequest: CreateBoardRequestDto): ResponseEntity<CreateBoardResponseDto> {
         val savedBoard = boardRepository.save(modelMapper.map(createBoardRequest, Board::class.java))
-        return ResponseEntity.created(URI.create("/api/boards/${savedBoard.id}")).body(modelMapper.map(savedBoard, CreateBoardResponseDto::class.java))
+        return ResponseEntity.created(URI.create("/api/boards/${savedBoard.id}"))
+            .body(modelMapper.map(savedBoard, CreateBoardResponseDto::class.java))
     }
 
     @Transactional
     @PutMapping(path = ["/boards/{id}"])
-    fun updateBoard(@RequestBody updateBoardRequestDto: UpdateBoardRequestDto, @PathVariable id: UUID): ResponseEntity<Board> {
+    fun updateBoard(
+        @RequestBody updateBoardRequestDto: UpdateBoardRequestDto,
+        @PathVariable id: UUID
+    ): ResponseEntity<Board> {
         val board = boardRepository.findById(id)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }!!
 

@@ -1,6 +1,7 @@
 package com.kanban.controllers
 
 import com.kanban.dtos.requests.CreateTaskRequestDto
+import com.kanban.dtos.requests.UpdateTaskPositionRequestDto
 import com.kanban.dtos.requests.UpdateTaskRequestDto
 import com.kanban.jooq.Tables.*
 import com.kanban.models.Subtask
@@ -109,22 +110,38 @@ class TaskController(
         return ResponseEntity.ok().build()
     }
 
-    fun updateStatus(taskId: UUID, columnId: UUID) {
+    @PutMapping(path = ["/tasks/{taskId}/position"])
+    fun updateTaskPosition(@RequestBody updateTaskPositionRequestDto: UpdateTaskPositionRequestDto, @PathVariable taskId: UUID): ResponseEntity<Void> {
+        if(updateTaskPositionRequestDto.taskId != taskId) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+
+        updateStatus(
+            taskId = updateTaskPositionRequestDto.taskId,
+            destinationColumnId = updateTaskPositionRequestDto.destinationColumnId,
+            destinationPosition = updateTaskPositionRequestDto.destinationTaskPosition
+        )
+
+        return ResponseEntity.ok().build()
+    }
+
+    fun updateStatus(taskId: UUID, destinationColumnId: UUID, destinationPosition: Int = -1) {
         val task = jooq.select(asterisk())
             .from(TASKS)
             .where(TASKS.ID.eq(taskId))
-            .fetchOneInto(TASKS)!!
+            .fetchOneInto(TASKS)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
         val columnName = jooq.select(COLUMNS.NAME)
             .from(COLUMNS)
-            .where(COLUMNS.ID.eq(columnId))
+            .where(COLUMNS.ID.eq(destinationColumnId))
             .fetchOneInto(String::class.java)
 
-        if(task.columnId != columnId){
+        if(task.columnId != destinationColumnId && destinationPosition == -1){
 
             jooq.update(TASKS)
-                .set(TASKS.POSITION, select(count()).from(TASKS).where(TASKS.COLUMN_ID.eq(columnId)))
-                .set(TASKS.COLUMN_ID, columnId)
+                .set(TASKS.POSITION, select(count()).from(TASKS).where(TASKS.COLUMN_ID.eq(destinationColumnId)))
+                .set(TASKS.COLUMN_ID, destinationColumnId)
                 .set(TASKS.STATUS, columnName)
                 .where(TASKS.ID.eq(taskId))
                 .execute()
@@ -133,6 +150,52 @@ class TaskController(
                 .set(TASKS.POSITION, TASKS.POSITION.minus(1))
                 .where(TASKS.POSITION.greaterThan(task.position))
                 .and(TASKS.COLUMN_ID.eq(task.columnId))
+                .execute()
+
+        } else if (task.columnId != destinationColumnId && destinationPosition != -1) {
+
+            jooq.update(TASKS)
+                .set(TASKS.POSITION, TASKS.POSITION.minus(1))
+                .where(TASKS.COLUMN_ID.eq(task.columnId))
+                .and(TASKS.POSITION.greaterThan(task.position))
+                .execute()
+
+            jooq.update(TASKS)
+                .set(TASKS.POSITION, TASKS.POSITION.plus(1))
+                .where(TASKS.POSITION.greaterOrEqual(destinationPosition))
+                .and(TASKS.COLUMN_ID.eq(destinationColumnId))
+                .execute()
+
+            jooq.update(TASKS)
+                .set(TASKS.COLUMN_ID, destinationColumnId)
+                .set(TASKS.POSITION, destinationPosition)
+                .set(TASKS.STATUS, columnName)
+                .where(TASKS.ID.eq(task.id))
+                .execute()
+
+        } else if(task.columnId == destinationColumnId && destinationPosition != -1) {
+
+            if(task.position > destinationPosition) {
+
+                jooq.update(TASKS)
+                    .set(TASKS.POSITION, TASKS.POSITION.plus(1))
+                    .where(TASKS.POSITION.between(destinationPosition, task.position))
+                    .and(TASKS.COLUMN_ID.eq(task.columnId))
+                    .execute()
+
+            } else if(task.position < destinationPosition) {
+
+                jooq.update(TASKS)
+                    .set(TASKS.POSITION, TASKS.POSITION.minus(1))
+                    .where(TASKS.POSITION.between(task.position, destinationPosition))
+                    .and(TASKS.COLUMN_ID.eq(task.columnId))
+                    .execute()
+
+            }
+
+            jooq.update(TASKS)
+                .set(TASKS.POSITION, destinationPosition)
+                .where(TASKS.ID.eq(task.id))
                 .execute()
 
         }
