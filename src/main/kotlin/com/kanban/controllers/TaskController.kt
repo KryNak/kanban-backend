@@ -7,7 +7,6 @@ import com.kanban.jooq.Tables.*
 import com.kanban.models.Subtask
 import com.kanban.models.Task
 import com.kanban.repositories.BoardsColumnRepository
-import com.kanban.repositories.TaskRepository
 import mu.KotlinLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -22,7 +21,6 @@ import java.util.*
 @RestController
 @RequestMapping(path = ["/api"])
 class TaskController(
-    val taskRepository: TaskRepository,
     val modelMapper: ModelMapper,
     val columnRepository: BoardsColumnRepository,
     val jooq: DSLContext
@@ -32,7 +30,31 @@ class TaskController(
 
     @DeleteMapping(path = ["/tasks/{id}"])
     fun deleteTask(@PathVariable id: UUID): ResponseEntity<Void> {
-        taskRepository.deleteById(id)
+
+        jooq.transaction { _ ->
+
+            val task = jooq.select(asterisk())
+                .from(TASKS)
+                .where(TASKS.ID.eq(id))
+                .fetchOneInto(TASKS)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+            jooq.delete(SUBTASKS)
+                .where(SUBTASKS.TASK_ID.eq(id))
+                .execute()
+
+            jooq.delete(TASKS)
+                .where(TASKS.ID.eq(id))
+                .execute()
+
+            jooq.update(TASKS)
+                .set(TASKS.POSITION, TASKS.POSITION.minus(1))
+                .where(TASKS.COLUMN_ID.eq(task.columnId))
+                .and(TASKS.POSITION.greaterThan(task.position))
+                .execute()
+
+        }
+
         return ResponseEntity.noContent().build()
     }
 

@@ -32,6 +32,7 @@ class BoardsController(
     fun getBoards(): ResponseEntity<List<GetBoardsResponseDto>> {
 
         val boards = boardRepository.findAll()
+            .sortedBy { it.position }
             .map { modelMapper.map(it, GetBoardsResponseDto::class.java) }
 
         return ResponseEntity.ok(boards)
@@ -119,7 +120,7 @@ class BoardsController(
         val updatedBoard = boardRepository.save(
             Board().apply {
                 this.id = board.id
-                this.name = board.name
+                this.name = updateBoardRequestDto.name
                 this.columns = (columnsIntersection + columnsExcept).sortedBy { it.position }.toMutableList()
             }
         )
