@@ -4,11 +4,14 @@ import com.kanban.dtos.requests.CreateBoardRequestDto
 import com.kanban.dtos.requests.UpdateBoardRequestDto
 import com.kanban.dtos.responses.CreateBoardResponseDto
 import com.kanban.dtos.responses.GetBoardsResponseDto
+import com.kanban.jooq.Tables.BOARDS
 import com.kanban.models.Board
 import com.kanban.models.BoardsColumn
 import com.kanban.repositories.BoardRepository
 import com.kanban.repositories.BoardsColumnRepository
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.asterisk
+import org.jooq.impl.DSL.count
 import org.modelmapper.ModelMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,8 +34,10 @@ class BoardsController(
     @GetMapping(path = ["/boards"])
     fun getBoards(): ResponseEntity<List<GetBoardsResponseDto>> {
 
-        val boards = boardRepository.findAll()
-            .sortedBy { it.position }
+        val boards = jooq.select(asterisk())
+            .from(BOARDS)
+            .orderBy(BOARDS.POSITION)
+            .fetchInto(BOARDS)
             .map { modelMapper.map(it, GetBoardsResponseDto::class.java) }
 
         return ResponseEntity.ok(boards)
@@ -41,8 +46,20 @@ class BoardsController(
     @DeleteMapping(path = ["/boards/{id}"])
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun deleteBoard(@PathVariable id: UUID) {
-        boardRepository.findById(id)
-            .ifPresent { boardRepository.deleteById(id) }
+
+        val board = jooq.select(asterisk())
+            .from(BOARDS)
+            .where(BOARDS.ID.eq(id))
+            .fetchOneInto(BOARDS)
+            ?: throw ResponseStatusException(HttpStatus.NO_CONTENT)
+
+        boardRepository.deleteById(board.id)
+
+        jooq.update(BOARDS)
+            .set(BOARDS.POSITION, BOARDS.POSITION.minus(1))
+            .where(BOARDS.POSITION.greaterThan(board.position))
+            .execute()
+
     }
 
     @GetMapping(path = ["/boards/{id}"])
@@ -74,7 +91,17 @@ class BoardsController(
 
     @PostMapping(path = ["/boards"])
     fun createBoard(@RequestBody createBoardRequest: CreateBoardRequestDto): ResponseEntity<CreateBoardResponseDto> {
-        val savedBoard = boardRepository.save(modelMapper.map(createBoardRequest, Board::class.java))
+
+        val count = jooq.select(count())
+            .from(BOARDS)
+            .fetchOneInto(Int::class.java)
+            ?: throw IllegalStateException("Query should always return a number")
+
+        val boardToSave = modelMapper.map(createBoardRequest, Board::class.java)
+        boardToSave.position = count
+
+        val savedBoard = boardRepository.save(boardToSave)
+
         return ResponseEntity.created(URI.create("/api/boards/${savedBoard.id}"))
             .body(modelMapper.map(savedBoard, CreateBoardResponseDto::class.java))
     }
@@ -122,6 +149,7 @@ class BoardsController(
                 this.id = board.id
                 this.name = updateBoardRequestDto.name
                 this.columns = (columnsIntersection + columnsExcept).sortedBy { it.position }.toMutableList()
+                this.position = board.position
             }
         )
 
