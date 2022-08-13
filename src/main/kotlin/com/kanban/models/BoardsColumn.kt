@@ -14,6 +14,8 @@ class BoardsColumn {
 
     var position: Int = 0
 
+    var color: String = ""
+
     @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @JoinColumn(name = "column_id")
     var tasks: MutableList<Task> = mutableListOf()

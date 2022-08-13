@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row5;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,6 +67,11 @@ public class Columns extends TableImpl<ColumnsRecord> {
      * The column <code>public.columns.board_id</code>.
      */
     public final TableField<ColumnsRecord, UUID> BOARD_ID = createField(DSL.name("board_id"), SQLDataType.UUID, this, "");
+
+    /**
+     * The column <code>public.columns.color</code>.
+     */
+    public final TableField<ColumnsRecord, String> COLOR = createField(DSL.name("color"), SQLDataType.CLOB, this, "");
 
     private Columns(Name alias, Table<ColumnsRecord> aliased) {
         this(alias, aliased, null);
@@ -152,11 +157,11 @@ public class Columns extends TableImpl<ColumnsRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row5 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<UUID, String, Integer, UUID> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<UUID, String, Integer, UUID, String> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 }

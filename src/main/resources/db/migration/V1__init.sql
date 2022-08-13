@@ -12,7 +12,8 @@ CREATE TABLE columns (
     id uuid NOT NULL,
     name character varying(255),
     position INT NOT NULL,
-    board_id uuid
+    board_id uuid,
+    color text
 );
 
 

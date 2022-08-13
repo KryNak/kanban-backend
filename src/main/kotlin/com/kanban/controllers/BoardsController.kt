@@ -9,6 +9,7 @@ import com.kanban.models.Board
 import com.kanban.models.BoardsColumn
 import com.kanban.repositories.BoardRepository
 import com.kanban.repositories.BoardsColumnRepository
+import com.kanban.utils.ColorUtils
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.asterisk
 import org.jooq.impl.DSL.count
@@ -99,6 +100,9 @@ class BoardsController(
 
         val boardToSave = modelMapper.map(createBoardRequest, Board::class.java)
         boardToSave.position = count
+        boardToSave.columns = boardToSave.columns
+            .map { it.apply { color = ColorUtils.getRandom() } }
+            .toMutableList()
 
         val savedBoard = boardRepository.save(boardToSave)
 
@@ -129,6 +133,7 @@ class BoardsController(
                     this.position = providedBoard.position
                     this.name = providedBoard.name
                     this.tasks = it.tasks
+                    this.color = it.color
                 }
             }
 
@@ -138,6 +143,7 @@ class BoardsController(
                 BoardsColumn().apply {
                     this.position = it.position
                     this.name = it.name
+                    this.color = ColorUtils.getRandom()
                 }
             }
 

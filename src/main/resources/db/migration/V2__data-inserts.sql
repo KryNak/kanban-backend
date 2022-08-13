@@ -4,15 +4,15 @@ INSERT INTO boards (id, name, position) VALUES ('41c31dca-798b-42fe-a9f5-385ff68
 
 
 
-INSERT INTO columns (id, name, board_id, position) VALUES ('392e7e88-fcd7-4a85-bc34-e9b2157ec8d9', 'Todo', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', 0);
-INSERT INTO columns (id, name, board_id, position) VALUES ('79ae8140-76f5-4c6a-b321-6b414565d8d6', 'Doing', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', 1);
-INSERT INTO columns (id, name, board_id, position) VALUES ('3a66140a-51be-430f-bc6b-72167588bebc', 'Done', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', 2);
-INSERT INTO columns (id, name, board_id, position) VALUES ('d320fba9-38d9-4267-9b76-d9992a260a59', 'Todo', '268f63a7-6fad-450e-8690-bd50b1418ec3', 0);
-INSERT INTO columns (id, name, board_id, position) VALUES ('5a10bfaf-9114-4108-9dfe-8d5148bff184', 'Doing', '268f63a7-6fad-450e-8690-bd50b1418ec3', 1);
-INSERT INTO columns (id, name, board_id, position) VALUES ('e6d95665-f88e-4a62-8d82-b0b83ea7bfaa', 'Done', '268f63a7-6fad-450e-8690-bd50b1418ec3', 2);
-INSERT INTO columns (id, name, board_id, position) VALUES ('902861d4-dce6-4359-a033-12645361a90d', 'Now', '41c31dca-798b-42fe-a9f5-385ff68a1dda', 0);
-INSERT INTO columns (id, name, board_id, position) VALUES ('51368d5a-26ea-4496-8251-387798f4bda2', 'Next', '41c31dca-798b-42fe-a9f5-385ff68a1dda', 1);
-INSERT INTO columns (id, name, board_id, position) VALUES ('89666704-33ca-488a-a2ad-1dcd3165ca61', 'Later', '41c31dca-798b-42fe-a9f5-385ff68a1dda', 2);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('392e7e88-fcd7-4a85-bc34-e9b2157ec8d9', 'Todo', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#001f3f', 0);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('79ae8140-76f5-4c6a-b321-6b414565d8d6', 'Doing', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#0074D9', 1);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('3a66140a-51be-430f-bc6b-72167588bebc', 'Done', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#F012BE', 2);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('d320fba9-38d9-4267-9b76-d9992a260a59', 'Todo', '268f63a7-6fad-450e-8690-bd50b1418ec3', '#85144b', 0);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('5a10bfaf-9114-4108-9dfe-8d5148bff184', 'Doing', '268f63a7-6fad-450e-8690-bd50b1418ec3', '#FFDC00', 1);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('e6d95665-f88e-4a62-8d82-b0b83ea7bfaa', 'Done', '268f63a7-6fad-450e-8690-bd50b1418ec3', '#3D9970', 2);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('902861d4-dce6-4359-a033-12645361a90d', 'Now', '41c31dca-798b-42fe-a9f5-385ff68a1dda', '#01FF70', 0);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('51368d5a-26ea-4496-8251-387798f4bda2', 'Next', '41c31dca-798b-42fe-a9f5-385ff68a1dda', '#B10DC9', 1);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('89666704-33ca-488a-a2ad-1dcd3165ca61', 'Later', '41c31dca-798b-42fe-a9f5-385ff68a1dda', '#39CCCC', 2);
 
 
 
