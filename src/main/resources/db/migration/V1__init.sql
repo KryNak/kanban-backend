@@ -1,6 +1,7 @@
 CREATE TABLE boards (
     id uuid NOT NULL,
-    name character varying(255)
+    name character varying(255),
+    position INT NOT NULL
 );
 
 

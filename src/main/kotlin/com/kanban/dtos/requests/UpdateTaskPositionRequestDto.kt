@@ -1,4 +1,9 @@
 package com.kanban.dtos.requests
 
-class UpdateTaskPositionRequestDto {
-}
+import java.util.UUID
+
+class UpdateTaskPositionRequestDto(
+    val taskId: UUID,
+    val destinationColumnId: UUID,
+    val destinationTaskPosition: Int
+)

@@ -1,6 +1,6 @@
-INSERT INTO boards (id, name) VALUES ('2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', 'Platform Launch');
-INSERT INTO boards (id, name) VALUES ('268f63a7-6fad-450e-8690-bd50b1418ec3', 'Marketing Plan');
-INSERT INTO boards (id, name) VALUES ('41c31dca-798b-42fe-a9f5-385ff68a1dda', 'Roadmap');
+INSERT INTO boards (id, name, position) VALUES ('2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', 'Platform Launch', 0);
+INSERT INTO boards (id, name, position) VALUES ('268f63a7-6fad-450e-8690-bd50b1418ec3', 'Marketing Plan', 1);
+INSERT INTO boards (id, name, position) VALUES ('41c31dca-798b-42fe-a9f5-385ff68a1dda', 'Roadmap', 2);
 
 
 
