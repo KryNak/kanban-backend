@@ -68,9 +68,9 @@ val dbLocalUrl = "jdbc:postgresql://localhost:5432/admin"
 val dbLocalUsername = "admin"
 val dbLocalPassword = "admin"
 
-val dbUrl = System.getenv()["DB_URL"] ?: dbLocalUrl
-val dbUsername = System.getenv()["DB_USERNAME"] ?: dbLocalUsername
-val dbPassword = System.getenv()["DB_PASSWORD"] ?: dbLocalPassword
+val dbUrl = System.getenv()["DATABASE_URL"] ?: dbLocalUrl
+val dbUsername = System.getenv()["DATABASE_USERNAME"] ?: dbLocalUsername
+val dbPassword = System.getenv()["DATABASE_PASSWORD"] ?: dbLocalPassword
 
 flyway {
     url = dbUrl
