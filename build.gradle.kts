@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.ir.backend.js.compile
 import org.jooq.meta.jaxb.*
 import org.jooq.meta.jaxb.Target
 import org.jooq.codegen.GenerationTool
@@ -15,7 +14,7 @@ plugins {
 }
 
 group = "com"
-version = "0.0.1-SNAPSHOT"
+version = "0.2.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -52,13 +51,6 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-flyway {
-    url = "jdbc:postgresql://localhost:5432/admin"
-    user = "admin"
-    password = "admin"
-    cleanDisabled = false
-}
-
 buildscript {
     repositories {
         mavenCentral()
@@ -70,6 +62,21 @@ buildscript {
         classpath("org.jooq:jooq-codegen:3.14.4")
         classpath("org.postgresql:postgresql:42.4.1")
     }
+}
+
+val dbLocalUrl = "jdbc:postgresql://localhost:5432/admin"
+val dbLocalUsername = "admin"
+val dbLocalPassword = "admin"
+
+val dbUrl = System.getenv()["DB_URL"] ?: dbLocalUrl
+val dbUsername = System.getenv()["DB_USERNAME"] ?: dbLocalUsername
+val dbPassword = System.getenv()["DB_PASSWORD"] ?: dbLocalPassword
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/admin"
+    user = "admin"
+    password = "admin"
+    cleanDisabled = false
 }
 
 tasks.create("jooqGenerate") {
