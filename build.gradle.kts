@@ -73,19 +73,19 @@ val dbUsername = System.getenv()["DB_USERNAME"] ?: dbLocalUsername
 val dbPassword = System.getenv()["DB_PASSWORD"] ?: dbLocalPassword
 
 flyway {
-    url = "jdbc:postgresql://localhost:5432/admin"
-    user = "admin"
-    password = "admin"
+    url = dbUrl
+    user = dbUsername
+    password = dbPassword
     cleanDisabled = false
 }
 
 tasks.create("jooqGenerate") {
     GenerationTool.generate(Configuration()
         .withJdbc(Jdbc()
-            .withUser("admin")
-            .withPassword("admin")
+            .withUser(dbUsername)
+            .withPassword(dbPassword)
             .withDriver("org.postgresql.Driver")
-            .withUrl("jdbc:postgresql://localhost:5432/admin"))
+            .withUrl(dbUrl))
         .withGenerator(Generator()
             .withDatabase(Database().withInputSchema("public"))
             .withGenerate(Generate())
