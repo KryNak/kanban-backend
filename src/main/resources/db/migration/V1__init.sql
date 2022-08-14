@@ -4,10 +4,6 @@ CREATE TABLE boards (
     position INT NOT NULL
 );
 
-
-ALTER TABLE boards OWNER TO admin;
-
-
 CREATE TABLE columns (
     id uuid NOT NULL,
     name character varying(255),
@@ -15,10 +11,6 @@ CREATE TABLE columns (
     board_id uuid,
     color text
 );
-
-
-ALTER TABLE columns OWNER TO admin;
-
 
 CREATE TABLE subtasks (
     id uuid NOT NULL,
@@ -28,10 +20,6 @@ CREATE TABLE subtasks (
     task_id uuid
 );
 
-
-ALTER TABLE subtasks OWNER TO admin;
-
-
 CREATE TABLE tasks (
     id uuid NOT NULL,
     description character varying(255),
@@ -40,10 +28,6 @@ CREATE TABLE tasks (
     column_id uuid,
     position INT NOT NULL
 );
-
-
-ALTER TABLE tasks OWNER TO admin;
-
 
 ALTER TABLE ONLY boards
     ADD CONSTRAINT boards_pkey PRIMARY KEY (id);
