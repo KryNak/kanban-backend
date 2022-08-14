@@ -4,7 +4,7 @@ INSERT INTO boards (id, name, position) VALUES ('41c31dca-798b-42fe-a9f5-385ff68
 
 
 
-INSERT INTO columns (id, name, board_id, color, position) VALUES ('392e7e88-fcd7-4a85-bc34-e9b2157ec8d9', 'Todo', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#001f3f', 0);
+INSERT INTO columns (id, name, board_id, color, position) VALUES ('392e7e88-fcd7-4a85-bc34-e9b2157ec8d9', 'Todo', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#FF6F61', 0);
 INSERT INTO columns (id, name, board_id, color, position) VALUES ('79ae8140-76f5-4c6a-b321-6b414565d8d6', 'Doing', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#0074D9', 1);
 INSERT INTO columns (id, name, board_id, color, position) VALUES ('3a66140a-51be-430f-bc6b-72167588bebc', 'Done', '2128b4ad-ecc2-4c1e-af8f-cd500c26af6f', '#F012BE', 2);
 INSERT INTO columns (id, name, board_id, color, position) VALUES ('d320fba9-38d9-4267-9b76-d9992a260a59', 'Todo', '268f63a7-6fad-450e-8690-bd50b1418ec3', '#85144b', 0);
