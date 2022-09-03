@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.Classloader
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jooq.meta.jaxb.*
 import org.jooq.meta.jaxb.Target
@@ -33,11 +34,14 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-jooq:2.7.2")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")
     testImplementation("org.assertj:assertj-core:3.23.1")
+    implementation("org.jooq:jooq:3.14.4")
+    implementation("org.jooq:jooq-codegen:3.14.4")
 }
 
 tasks.withType<KotlinCompile> {
@@ -52,6 +56,11 @@ tasks.withType<Test> {
 }
 
 buildscript {
+
+    plugins {
+        id("co.uzzu.dotenv.gradle") version "2.0.0"
+    }
+
     repositories {
         mavenCentral()
         mavenLocal()
@@ -64,13 +73,13 @@ buildscript {
     }
 }
 
-val dbLocalUrl = "jdbc:postgresql://localhost:5432/admin"
-val dbLocalUsername = "admin"
-val dbLocalPassword = "admin"
+val dbUrlKey = "KANBAN_APP_DATABASE_URL"
+val dbUsernameKey = "KANBAN_APP_DATABASE_USERNAME"
+val dbPasswordKey = "KANBAN_APP_DATABASE_PASSWORD"
 
-val dbUrl = System.getenv()["KANBAN_APP_DATABASE_URL"] ?: dbLocalUrl
-val dbUsername = System.getenv()["KANBAN_APP_DATABASE_USERNAME"] ?: dbLocalUsername
-val dbPassword = System.getenv()["KANBAN_APP_DATABASE_PASSWORD"] ?: dbLocalPassword
+val dbUrl = env.fetch(dbUrlKey, System.getenv(dbUrlKey) ?: "")
+val dbUsername = env.fetch(dbUsernameKey, System.getenv(dbUsernameKey) ?: "")
+val dbPassword = env.fetch(dbPasswordKey, System.getenv(dbPasswordKey) ?: "")
 
 flyway {
     url = dbUrl
@@ -80,16 +89,26 @@ flyway {
 }
 
 tasks.create("jooqGenerate") {
-    GenerationTool.generate(Configuration()
-        .withJdbc(Jdbc()
-            .withUser(dbUsername)
-            .withPassword(dbPassword)
-            .withDriver("org.postgresql.Driver")
-            .withUrl(dbUrl))
-        .withGenerator(Generator()
-            .withDatabase(Database().withInputSchema("public"))
-            .withGenerate(Generate())
-            .withTarget(Target()
-                .withPackageName("com.kanban.jooq")
-                .withDirectory("${projectDir}/src/main/java"))))
+    GenerationTool.generate(
+        Configuration()
+            .withJdbc(
+                Jdbc()
+                    .withUser(dbUsername)
+                    .withPassword(dbPassword)
+                    .withDriver("org.postgresql.Driver")
+                    .withUrl(dbUrl)
+            )
+            .withGenerator(
+                Generator()
+                    .withDatabase(Database()
+                        .withInputSchema("public")
+                        .withIncludes("BOARDS|COLUMNS|SUBTASKS|TASKS|USERS"))
+                    .withGenerate(Generate())
+                    .withTarget(
+                        Target()
+                            .withPackageName("com.kanban.jooq")
+                            .withDirectory("${projectDir}/src/main/java")
+                    )
+            )
+    )
 }
