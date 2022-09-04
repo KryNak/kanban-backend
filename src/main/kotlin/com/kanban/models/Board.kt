@@ -18,6 +18,8 @@ class Board {
 
     var position: Int = 0
 
+    var userId: UUID? = null
+
     @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @JoinColumn(name = "board_id")
     var columns: MutableList<BoardsColumn> = mutableListOf()

@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row3;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -62,6 +62,11 @@ public class Boards extends TableImpl<BoardsRecord> {
      * The column <code>public.boards.position</code>.
      */
     public final TableField<BoardsRecord, Integer> POSITION = createField(DSL.name("position"), SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>public.boards.user_id</code>.
+     */
+    public final TableField<BoardsRecord, UUID> USER_ID = createField(DSL.name("user_id"), SQLDataType.UUID.nullable(false), this, "");
 
     private Boards(Name alias, Table<BoardsRecord> aliased) {
         this(alias, aliased, null);
@@ -138,11 +143,11 @@ public class Boards extends TableImpl<BoardsRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row3 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<UUID, String, Integer> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Row4<UUID, String, Integer, UUID> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

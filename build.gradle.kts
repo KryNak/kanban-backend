@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.Classloader
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jooq.meta.jaxb.*
 import org.jooq.meta.jaxb.Target

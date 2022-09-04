@@ -10,6 +10,7 @@ import com.kanban.models.BoardsColumn
 import com.kanban.repositories.BoardRepository
 import com.kanban.repositories.BoardsColumnRepository
 import com.kanban.utils.ColorUtils
+import com.kanban.utils.SecurityUtils
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.asterisk
 import org.jooq.impl.DSL.count
@@ -35,11 +36,15 @@ class BoardsController(
     @GetMapping(path = ["/boards"])
     fun getBoards(): ResponseEntity<List<GetBoardsResponseDto>> {
 
+        val userId = SecurityUtils.getUserId()
+
         val boards = jooq.select(asterisk())
             .from(BOARDS)
+            .where(BOARDS.USER_ID.eq(UUID.fromString(userId)))
             .orderBy(BOARDS.POSITION)
             .fetchInto(BOARDS)
             .map { modelMapper.map(it, GetBoardsResponseDto::class.java) }
+
 
         return ResponseEntity.ok(boards)
     }
@@ -100,6 +105,7 @@ class BoardsController(
 
         val boardToSave = modelMapper.map(createBoardRequest, Board::class.java)
         boardToSave.position = count
+        boardToSave.userId = UUID.fromString(SecurityUtils.getUserId())
         boardToSave.columns = boardToSave.columns
             .map { it.apply { color = ColorUtils.getRandom() } }
             .toMutableList()
@@ -156,6 +162,7 @@ class BoardsController(
                 this.name = updateBoardRequestDto.name
                 this.columns = (columnsIntersection + columnsExcept).sortedBy { it.position }.toMutableList()
                 this.position = board.position
+                this.userId = board.userId
             }
         )
 
